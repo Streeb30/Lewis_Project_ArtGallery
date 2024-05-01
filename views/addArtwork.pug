@@ -1,0 +1,39 @@
+extends layout
+
+block content
+  h1 Add New Artwork
+  if showAlert
+    script.
+      alert('Artwork with this title already exists!');
+
+  form(method='POST', action='/artist/add-artwork')
+    .form-group
+      label(for='Title') Title:
+      input(type='text', name='Title', required)
+
+    .form-group
+      label(for='Year') Year:
+      input(type='text', name='Year', required)
+
+    .form-group
+      label(for='Category') Category:
+      input(type='text', name='Category', required)
+
+    .form-group
+      label(for='Medium') Medium:
+      input(type='text', name='Medium', required)
+
+    .form-group
+      label(for='Description') Description:
+      textarea(name='Description', required)
+
+    .form-group
+      label(for='Poster') Poster Image URL:
+      input(type='text', name='Poster', accept='image/*')
+
+    button(type='submit') Add Artwork
+
+  if user.accountType === 'artist'
+    a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+    a(href='/patron') Back to Patron Page

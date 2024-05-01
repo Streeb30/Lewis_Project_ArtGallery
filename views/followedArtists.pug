@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1 Followed Artists
+  ul
+    each artist in followedArtists
+      li
+        a(href='/patron/artist/' + artist.username) #{artist.username}
+        // Add a form with a POST method for unfollowing
+        form(method="POST", action="/patron/unfollow-artist/" + artist.username) 
+          button(type="submit") Stop Following
+
+  if user.accountType === 'artist'
+    a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+    a(href='/patron') Back to Patron Page

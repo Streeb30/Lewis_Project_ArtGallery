@@ -1,0 +1,22 @@
+block content
+  h1 Your Notifications!
+
+  if notifications.length
+    ul
+      each notification in notifications
+        li(class=notification.read ? 'read' : 'unread')
+          p Artist: #{notification.artist.username}
+          case notification.type
+            when 'new_artwork'
+              a(href='/patron/artwork/' + notification.referenceId.toString())
+                p New artwork added: #{notification.message}
+            when 'new_workshop'
+              a(href='/patron/workshop/' + notification.referenceId.toString())
+                p New workshop created: #{notification.message}
+            default
+              p= notification.message
+
+  if user.accountType === 'artist'
+    a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+    a(href='/patron') Back to Patron Page

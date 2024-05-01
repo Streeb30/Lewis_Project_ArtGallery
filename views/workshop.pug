@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1 #{workshop.title}
+  
+  p
+    strong Artist: 
+    span= workshop.artist.username
+
+  p
+    a(href='/patron/artist/' + workshop.artist.username) Back to #{workshop.artist.username}'s Profile
+
+  // Display enrolled users
+  h2 Enrolled Users
+  ul
+    each user in workshop.enrolledUsers
+      li
+        a(href='/patron/artist/' + user.username)= user.username
+
+  // Links to artist dashboards
+  if user.accountType === 'artist'
+    a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+    a(href='/patron') Back to Patron Page

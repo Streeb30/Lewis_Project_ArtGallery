@@ -1,0 +1,75 @@
+extends layout
+
+block content
+  if query && query.error
+    .alert.alert-danger #{query.error}
+  h1 Reviewed/Liked Artworks
+
+  h2 Reviewed Artworks
+  if reviewedArtworks.length
+    ul
+      each review in reviewedArtworks
+        li
+          a(href='/patron/artwork/' + review.artworkId._id)= review.artworkId.Title
+          p #{review.content}
+          form.review-form(method='post', action='/patron/artwork/' + review.artworkId._id + '/remove-review/' + review._id)
+            button(type='button', onclick='removeReview(this)') Remove Review
+  else
+    p No reviewed artworks.
+
+  h2 Liked Artworks
+  if likedArtworks.length
+    ul
+      each like in likedArtworks
+        li
+          a(href='/patron/artwork/' + like.artworkId._id)= like.artworkId.Title
+          form.like-form(method='post', action='/patron/artwork/' + like.artworkId._id + '/remove-like/' + like._id)
+            button(type='button', onclick='removeLike(this)') Remove Like
+  else
+    p No liked artworks.
+
+  if user.accountType === 'artist'
+        a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+      a(href='/patron') Back to Patron Page
+
+  script.
+    function removeReview(button) {
+      const form = button.closest('form');
+      fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+        credentials: 'same-origin'
+      }).then(response => {
+        if (response.ok) {
+          form.parentElement.remove();
+        } else {
+          alert('Failed to remove the review. Please try again.');
+        }
+      }).catch(error => {
+        console.error('Error removing review:', error);
+      });
+    }
+
+    function removeLike(button) {
+      const form = button.closest('form');
+      fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+        credentials: 'same-origin'
+      }).then(response => {
+        if (response.ok) {
+          form.parentElement.remove();
+        } else {
+          alert('Failed to remove the like. Please try again.');
+        }
+      }).catch(error => {
+        console.error('Error removing like:', error);
+      });
+    }

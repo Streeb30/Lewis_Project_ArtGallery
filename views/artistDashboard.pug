@@ -1,0 +1,48 @@
+extends layout
+
+block content
+  h1 Artist Dashboard
+  if success
+    script.
+      alert("#{success}")
+  p Welcome, #{user.username} (Artist)
+
+  ul
+    li
+      a(href='/patron/follow-artist') Artists Followed
+    li
+      a(href='/patron/reviewed-liked-artworks') Reviewed/Liked Artworks
+    li
+      a(href='/patron/notifications') Notifications
+    li
+      a(href='/patron/search-artworks') Search Artworks
+    li
+      a(href='/artist/add-artwork') Add Artwork
+    li
+      a(href='/artist/add-workshop') Add Workshop
+    
+  p
+    a(href='/artist/switch-to-patron') Switch to Patron
+
+  p
+    a(href='/user/logout') Log out
+
+
+  h2 My Artworks
+  if artworks.length
+    ul
+      each artwork in artworks
+        li
+            a(href='/patron/artwork/' + artwork._id) #{artwork.Title}
+  else
+    p No artworks added yet.
+
+  h2 My Workshops
+  if workshops.length
+    ul
+      each workshop in workshops
+        li
+          a(href='/patron/workshop/' + workshop._id) #{workshop.title}
+  else
+    p No workshops created yet.
+

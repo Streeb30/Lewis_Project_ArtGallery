@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1 Add New Workshop
+  form(method='POST', action='/artist/add-workshop')
+    .form-group
+      label(for='title') Title:
+      input(type='text', name='title', required)
+
+    .form-group
+      label(for='description') Description:
+      textarea(name='description', required)
+
+    .form-group
+      label(for='date') Date:
+      input(type='date', name='date', required)
+
+    button(type='submit') Add Workshop
+
+  a(href='/artist/artist-dashboard') Back to Artist Dashboard

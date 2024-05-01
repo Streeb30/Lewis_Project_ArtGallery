@@ -1,0 +1,76 @@
+extends layout
+
+block content
+  h1 #{artistName}'s Profile
+
+  h2 Artworks
+  ul
+    each artwork in artworks
+      li
+        a(href='/patron/artwork/' + artwork._id) #{artwork.Title}
+
+  h2 Workshops
+  if workshops.length
+    ul
+      each workshop in workshops
+        li
+          a(href='/patron/workshop/' + workshop._id)= workshop.title
+          form(method='post', action='/patron/enroll-workshop/' + workshop._id + '?redirect=' + artistName, class='enroll-form')
+            button(type='submit') Enroll
+  else
+    p This artist has not created any workshops yet.
+
+  // Button to follow the artist
+  form(method='post', action='/patron/follow-artist/' + artistName, id='followArtistForm')
+    button(type='submit') Follow #{artistName}
+
+  if user.accountType === 'artist'
+      a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+      a(href='/patron') Back to Patron Page
+
+  script.
+    document.getElementById('followArtistForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // To prevent the default form submission
+      var form = this;
+      fetch(form.action, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          alert('Successfully followed the artist!');
+          window.location.href = '/patron/artist/' + '#{artistName}';
+        } else {
+          alert('Failed to follow the artist. Please try again.');
+        }
+      }).catch(error => {
+        console.error('Error following artist:', error);
+        alert('An error occurred. Please try again.');
+      });
+    });
+
+    // Enroll in workshop form submission handling
+    document.querySelectorAll('.enroll-form').forEach(form => {
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          credentials: 'same-origin'
+        }).then(response => {
+          if (response.ok) {
+            alert('Successfully enrolled in the workshop!');
+            location.reload(); // Reload the page
+          } else {
+            alert('Failed to enroll in the workshop. Please try again.');
+          }
+        }).catch(error => {
+          console.error('Error enrolling in workshop:', error);
+          alert('An error occurred. Please try again.');
+        });
+      });
+    });

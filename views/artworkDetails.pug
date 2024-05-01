@@ -1,0 +1,66 @@
+extends layout
+
+block content
+    h1= artwork.Title
+    p
+        strong Artist: 
+        a(href='/patron/artist/' + artwork.Artist)= artwork.Artist
+    p
+        strong Year: 
+        span= artwork.Year
+    p
+        strong Category: 
+        a(href=`/patron/search-artworks?query=${artwork.Category}`)= artwork.Category
+    p
+        strong Medium: 
+        span= artwork.Medium
+    p
+        strong Description: 
+        span= artwork.Description
+    if artwork.Poster
+        img(src=artwork.Poster, alt=`Poster of ${artwork.Title}`)
+  
+    h2 Reviews
+    each review in reviews
+        div.review-block
+            p.review-text #{review.content}
+            if review.userId.toString() === req.session.user._id.toString()
+                form.review-form(method='post', action='/patron/artwork/' + artwork._id + '/remove-review/' + review._id)
+                    button(type='submit') Remove Review
+    div.add-review-form
+        form(method='post', action='/patron/artwork/' + artwork._id + '/review')
+            textarea(name='review', placeholder='Write a review')
+            button(type='submit') Submit Review
+
+    h2 Likes
+    p Number of likes: #{likes.length}
+    form(method='post', action='/patron/artwork/' + artwork._id + '/like')
+        button(type='submit') Like
+    if userLike
+        form(method='post', action='/patron/artwork/' + artwork._id + '/remove-like/' + userLike._id)
+            button(type='submit') Remove Like
+
+    if user.accountType === 'artist'
+        a(href='/artist/artist-dashboard') Back to Artist Dashboard
+    else
+        a(href='/patron') Back to Patron Page
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviewForm = document.querySelector('form[action^="/patron/artwork/' + #{artwork._id} + '/review"]');
+            const likeForm = document.querySelector('form[action^="/patron/artwork/' + #{artwork._id} + '/like"]');
+
+            const artistName = #{JSON.stringify(artwork.Artist)};
+            const currentUsername = #{JSON.stringify(req.session.user.username)};
+
+            const showAlert = function(event) {
+                if (artistName === currentUsername) {
+                    event.preventDefault();
+                    alert('You cannot review or like your own artwork.');
+                }
+            };
+
+            if (reviewForm) reviewForm.addEventListener('submit', showAlert);
+            if (likeForm) likeForm.addEventListener('submit', showAlert);
+        });
+

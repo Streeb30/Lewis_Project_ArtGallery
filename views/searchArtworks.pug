@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1 Search Artworks
+  form(method='get', action='/patron/search-artworks')
+    input(type='text', name='query', placeholder='Search by title, artist, or category', value=query)
+    button(type='submit') Search
+
+  if artworks.length
+    ul
+      each artwork in artworks
+        li
+          a(href=`/patron/artwork/${artwork._id}`)= artwork.Title
+          |  by #{artwork.Artist}
+
+    // The pagination
+    if pagination.hasPrev
+      a(href=`/patron/search-artworks?query=${query}&page=${pagination.prev}`) Previous
+    if pagination.hasNext
+      a(href=`/patron/search-artworks?query=${query}&page=${pagination.next}`) Next
+
+  else
+    p No artworks found for your query.
+
+  h2 
+  if user.accountType === 'artist'
+        a(href='/artist/artist-dashboard') Back to Artist Dashboard
+  else
+      a(href='/patron') Back to Patron Page

@@ -40,7 +40,7 @@ router.get('/reviewed-liked-artworks', ensureLoggedIn, async (req, res) => {
         const validReviews = reviews.filter(review => review.artworkId !== null);
         const validLikes = likes.filter(like => like.artworkId !== null);
         // Pass the filtered reviews and likes to the template
-        res.render('reviewedAndLiked', { 
+        res.render('reviewedAndLiked', {
             reviewedArtworks: validReviews,
             likedArtworks: validLikes,
             user: req.session.user,

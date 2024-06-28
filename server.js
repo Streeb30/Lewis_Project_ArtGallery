@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true })); // Handle URL-encoded data
 app.use(express.json()); // Body parser middleware
 
 app.use(session({
-    secret: 'your-session-secret',
+    secret: 'Lewis',
     resave: false,
     saveUninitialized: false
 }));

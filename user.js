@@ -34,20 +34,20 @@ const User = mongoose.model('User', userSchema);
 const register = async (req, res) => {
     try {
         const { username, password } = req.body;
-        const newUser = new User({ username, password });
-        await newUser.save();
-        req.session.user = newUser;
+        let newUser = new User({ username, password });
+        newUser = await newUser.save();
+        req.session.user = newUser.toObject();
         res.redirect('/patron?success=Registration successful');
     } catch (error) {
-        // Handle duplicate username error
-        if (error.code === 11000) { // MongoDB duplicate key error code
+        console.log('Error during registration:', error);
+        if (error.code === 11000) {
             res.redirect('/user/register?error=Username already registered');
         } else {
-            console.error('Registration error:', error);
-            res.status(400).send(error.message);
+            res.status(500).send('Error during registration');
         }
     }
 };
+
 
 const login = async (req, res) => {
     try {

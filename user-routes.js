@@ -10,7 +10,7 @@ const ensureLoggedIn = (req, res, next) => {
     }
 };
 
-//Get HTTP
+// GET routes
 router.get('/register', (req, res) => {
     res.render('register', { query: req.query });
 });
@@ -20,11 +20,9 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/patron', (req, res) => {
-    // Ensure the user is logged in
     if (!req.session.user) {
         return res.redirect('/user/login');
     }
-
     res.render('Patron', { user: req.session.user });
 });
 
@@ -41,13 +39,18 @@ router.get('/logout', (req, res) => {
 router.get('/upgrade-to-artist', ensureLoggedIn, async (req, res) => {
     try {
         const userId = req.session.user._id;
-        const user = await User.findById(userId).populate('artistProfile.artworks'); // Fetch the user and populate their artworks
-        // Check if the user already has artworks
+        const user = await User.findById(userId).populate('artistProfile.artworks');
         if (user.artistProfile && user.artistProfile.artworks.length > 0) {
             user.accountType = 'artist';
             await user.save();
-            req.session.user.accountType = 'artist'; // Update session information
-            res.redirect('/artist/artist-dashboard');
+            req.session.user.accountType = 'artist';
+            req.session.save(err => {
+                if (err) {
+                    console.error('Session save error:', err);
+                    return res.status(500).send('Internal Server Error');
+                }
+                res.redirect('/artist/artist-dashboard');
+            });
         } else {
             res.redirect('/artist/add-artwork');
         }
@@ -65,7 +68,7 @@ router.get('/protected-route', authMiddleware, (req, res) => {
     res.send('This is a protected route');
 });
 
-//Post HTTP
+// POST routes
 router.post('/register', register);
 
 router.post('/login', async (req, res) => {
@@ -73,15 +76,20 @@ router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         if (!user || user.password !== password) {
-            return res.redirect('/user/login?error=Invalid username or password'); // Redirect to login with error query parameter
+            return res.redirect('/user/login?error=Invalid username or password');
         }
         req.session.user = user;
-        // Redirect user to the appropriate dashboard based on their account type
-        if (user.accountType === 'artist') {
-            res.redirect('/artist/artist-dashboard');
-        } else {
-            res.redirect('/patron');
-        }
+        req.session.save(err => {  // Ensure the session is saved before redirecting
+            if (err) {
+                console.error('Session save error:', err);
+                return res.status(500).send('Failed to save session');
+            }
+            if (user.accountType === 'artist') {
+                res.redirect('/artist/artist-dashboard');
+            } else {
+                res.redirect('/patron');
+            }
+        });
     } catch (error) {
         console.error('Login error:', error);
         res.redirect('/user/login?error=An error occurred. Please try again.');
@@ -90,26 +98,20 @@ router.post('/login', async (req, res) => {
 
 router.post('/switch-account-type', ensureLoggedIn, async (req, res) => {
     const user = await User.findById(req.session.user._id);
-
-    if (user.accountType === 'patron') {
-        // Check if the user has artworks
-        const hasArtworks = user.artistProlfie && user.artistProfile.artworks.length > 0;
-        if (!hasArtworks) {
-            res.redirect('/add-artwork');
-        } else {
-            // Switch to artist type
-            user.accountType = 'artist';
-            await user.save();
-            req.session.user = user; // Update session
-            res.redirect('/artist/artist-dashboard');
-        }
+    if (user.accountType === 'patron' && (user.artistProfile && user.artistProfile.artworks.length > 0)) {
+        user.accountType = 'artist';
     } else {
-        // Switch to patron type
         user.accountType = 'patron';
-        await user.save();
-        req.session.user = user;
-        res.redirect('/patron');
     }
+    await user.save();
+    req.session.user = user;
+    req.session.save(err => {
+        if (err) {
+            console.error('Session save error:', err);
+            return res.status(500).send('Failed to save session');
+        }
+        res.redirect(user.accountType === 'artist' ? '/artist/artist-dashboard' : '/patron');
+    });
 });
 
 module.exports = router;

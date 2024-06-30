@@ -23,14 +23,12 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true })); // Handle URL-encoded data
 app.use(express.json()); // Body parser middleware
-app.use('/user', userRoutes);
+app.use('/user', userRoutes); //user routes
 app.use('/patron', patronRoutes); 
 app.use('/artist', artistRoutes); 
 
 // MongoDB connection setup
-// const mongoDB = process.env.MONGODB_URI;
 mongoose.connect(process.env.MONGODB_URI);
-
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));

@@ -2,11 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const { loadData } = require('./insertData'); //init the Data(gallery.json)
-const { loadArtists } = require('./insertArtists'); //make user accounts for every artist in gallery.json
-const artistRoutes = require('./artist-routes'); //require artist routes
-const patronRoutes = require('./patron-routes'); //require patron routes
-const userRoutes = require('./user-routes'); //require user routes
+const { loadData } = require('./insertData'); // init the Data(gallery.json)
+const { loadArtists } = require('./insertArtists'); // make user accounts for every artist in gallery.json
+const artistRoutes = require('./artist-routes'); // require artist routes
+const patronRoutes = require('./patron-routes'); // require patron routes
+const userRoutes = require('./user-routes'); // require user routes
 const path = require('path');
 const MongoStore = require('connect-mongo');
 
@@ -20,37 +20,35 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI })
 }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true })); // Handle URL-encoded data
 app.use(express.json()); // Body parser middleware
-app.use('/user', userRoutes); //user routes
-app.use('/patron', patronRoutes); 
-app.use('/artist', artistRoutes); 
+app.use('/user', userRoutes); // user routes
+app.use('/patron', patronRoutes);
+app.use('/artist', artistRoutes);
 
 // MongoDB connection setup
-// mongoose.connect(process.env.MONGODB_URI);
 mongoose.set('debug', true);
 const connectWithRetry = () => {
     console.log('MongoDB connection with retry');
     mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-      ssl: true // Ensure SSL is enabled
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        ssl: true // Ensure SSL is enabled
     }).then(() => {
-      console.log('MongoDB is connected');
+        console.log('MongoDB is connected');
     }).catch(err => {
-      console.log('MongoDB connection unsuccessful, retry after 5 seconds. ', err);
-      setTimeout(connectWithRetry, 5000);
+        console.log('MongoDB connection unsuccessful, retry after 5 seconds. ', err);
+        setTimeout(connectWithRetry, 5000);
     });
-  };
+};
 connectWithRetry();
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', async () => {
-    console.log('Connected to MongoDB');     
+    console.log('Connected to MongoDB');
     try {
         await loadData(); // Load artwork data
         await loadArtists(); // Create artist accounts

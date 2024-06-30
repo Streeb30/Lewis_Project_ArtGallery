@@ -28,7 +28,24 @@ app.use('/patron', patronRoutes);
 app.use('/artist', artistRoutes); 
 
 // MongoDB connection setup
-mongoose.connect(process.env.MONGODB_URI);
+// mongoose.connect(process.env.MONGODB_URI);
+mongoose.set('debug', true);
+const connectWithRetry = () => {
+    console.log('MongoDB connection with retry');
+    mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+      ssl: true // Ensure SSL is enabled
+    }).then(() => {
+      console.log('MongoDB is connected');
+    }).catch(err => {
+      console.log('MongoDB connection unsuccessful, retry after 5 seconds. ', err);
+      setTimeout(connectWithRetry, 5000);
+    });
+  };
+connectWithRetry();
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));

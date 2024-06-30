@@ -2,11 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const { loadData } = require('./insertData'); //init the Data(gallery.json)
-const { loadArtists } = require('./insertArtists'); //make user accounts for every artist in gallery.json
-const artistRoutes = require('./artist-routes'); //require artist routes
-const patronRoutes = require('./patron-routes'); //require patron routes
-const userRoutes = require('./user-routes'); //require user routes
+const { loadData } = require('./insertData');
+const { loadArtists } = require('./insertArtists');
+const artistRoutes = require('./artist-routes');
+const patronRoutes = require('./patron-routes');
+const userRoutes = require('./user-routes');
 const path = require('path');
 const MongoStore = require('connect-mongo');
 
@@ -20,18 +20,19 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI })
 }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true })); // Handle URL-encoded data
-app.use(express.json()); // Body parser middleware
-app.use('/user', userRoutes); //user routes
-app.use('/patron', patronRoutes); 
-app.use('/artist', artistRoutes); 
 
-// MongoDB connection setup
-mongoose.set('debug', true);
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use('/user', userRoutes);
+app.use('/patron', patronRoutes);
+app.use('/artist', artistRoutes);
+
 const connectWithRetry = () => {
     console.log('MongoDB connection with retry');
     mongoose.connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
         ssl: true // Ensure SSL is enabled
     }).then(() => {
         console.log('MongoDB is connected');
@@ -40,22 +41,22 @@ const connectWithRetry = () => {
         setTimeout(connectWithRetry, 5000);
     });
 };
+
 connectWithRetry();
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', async () => {
-    console.log('Connected to MongoDB');     
+    console.log('Connected to MongoDB');
     try {
-        await loadData(); // Load artwork data
-        await loadArtists(); // Create artist accounts
+        await loadData();
+        await loadArtists();
         console.log('Data and artist accounts loaded successfully');
     } catch (error) {
         console.error('Error loading data and artist accounts:', error);
     }
 });
 
-// Routes test setup
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {

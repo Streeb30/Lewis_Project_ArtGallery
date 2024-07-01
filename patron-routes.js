@@ -98,14 +98,14 @@ router.get('/search-artworks', ensureLoggedIn, async (req, res) => {
                 next: page + 1,
                 prev: page - 1
             };
-            res.render('SearchArtworks', { 
+            res.render('searchArtworks', { 
                 artworks,
                 pagination,
                 query,
                 user: req.session.user
             });
         } else {
-            res.render('SearchArtworks', { // Render the search page without any artworks
+            res.render('searchArtworks', { // Render the search page without any artworks
                 artworks: [],
                 query: '',
                 user: req.session.user

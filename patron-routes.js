@@ -14,7 +14,7 @@ router.get('/', ensureLoggedIn, (req, res) => { // Route for the main Patron Das
     if (req.query.success) {
         res.locals.success = req.query.success;
     }
-    res.render('Patron', { user: req.session.user });
+    res.render('patron', { user: req.session.user });
 });
 
 router.get('/follow-artist', ensureLoggedIn, async (req, res) => {

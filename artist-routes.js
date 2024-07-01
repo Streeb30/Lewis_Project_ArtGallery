@@ -1,13 +1,12 @@
 const express = require('express');
-const Artwork = require('./Artworks'); // Import Artworks
-const Notification = require('./models/notification'); // Import Notification model
-const { User } = require('./user'); // Import the User model for managing user data
-const Workshop = require('./models/workshop'); // Import the Workshop model
-const router = express.Router(); // Create a new router object to handle routing
-const { ensureLoggedIn } = require('./middleware'); // Import middleware to ensure user is logged in
+const Artwork = require('./Artworks');
+const Notification = require('./models/notification');
+const { User } = require('./user');
+const Workshop = require('./models/workshop');
+const router = express.Router();
+const { ensureLoggedIn } = require('./middleware'); //import middleware to ensure user is logged in
 
 async function createNotificationForFollowers(artistId, message, type, referenceId) {
-    // Find followers by artist ID
     const followers = await User.find({ followedArtists: artistId });
     followers.forEach(async (follower) => {
         const notification = new Notification({
@@ -18,10 +17,9 @@ async function createNotificationForFollowers(artistId, message, type, reference
             referenceId
         });
         await notification.save();
-    });    
+    });
 }
 
-//Get HTTP
 router.get('/add-artwork', ensureLoggedIn, (req, res) => {
     res.render('addArtwork', {
         user: req.session.user
@@ -104,7 +102,6 @@ router.get('/switch-to-patron', async (req, res) => {
     }
 });
 
-//Post HTTP
 router.post('/add-artwork', ensureLoggedIn, async (req, res) => {
     try {
         const { Title, Year, Category, Medium, Description, Poster } = req.body;

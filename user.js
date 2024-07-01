@@ -1,27 +1,27 @@
 const mongoose = require('mongoose');
-const Artwork = require('./Artworks'); // Import the Artwork model
+const Artwork = require('./Artworks');
 
 // Define the user schema
 const userSchema = new mongoose.Schema({
-    username: { // Unique username
+    username: {
         type: String,
         required: true,
         unique: true
     },
-    password: { // User password
+    password: {
         type: String,
         required: true
     },
-    accountType: { // User type is either 'patron' or 'artist', but faults to 'patron'
+    accountType: {
         type: String,
         required: true,
         enum: ['patron', 'artist'],
         default: 'patron'
     },
-    artistProfile: { // Profile for artist users, stores array of artwork references
+    artistProfile: { 
         artworks: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Artworks' // Ensure this matches the model name used in Artworks.js
+            ref: 'Artworks'
         }]
     },
     followedArtists: [{
@@ -64,7 +64,6 @@ const login = async (req, res) => {
     }
 };
 
-// Authentication Middleware
 const authMiddleware = (req, res, next) => {
     if (req.session && req.session.user) {
         return next();
@@ -73,7 +72,6 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-// Function to switch a user's account type
 const switchAccountType = async (req, res) => {
     try {
         const { username, newType } = req.body;
@@ -87,7 +85,6 @@ const switchAccountType = async (req, res) => {
     }
 };
 
-// Exporting the User model and functions
 module.exports = {
     User,
     register,

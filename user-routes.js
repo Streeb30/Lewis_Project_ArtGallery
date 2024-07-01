@@ -11,7 +11,6 @@ const ensureLoggedIn = (req, res, next) => {
     }
 };
 
-// GET routes
 router.get('/register', (req, res) => {
     res.render('register', { query: req.query });
 });
@@ -69,7 +68,6 @@ router.get('/protected-route', authMiddleware, (req, res) => {
     res.send('This is a protected route');
 });
 
-// POST routes
 router.post('/register', register);
 
 router.post('/login', async (req, res) => {
@@ -80,7 +78,7 @@ router.post('/login', async (req, res) => {
             return res.redirect('/user/login?error=Invalid username or password');
         }
         req.session.user = user;
-        req.session.save(err => {  // Ensure the session is saved before redirecting
+        req.session.save(err => {
             if (err) {
                 console.error('Session save error:', err);
                 return res.status(500).send('Failed to save session');

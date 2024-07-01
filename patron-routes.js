@@ -1,16 +1,15 @@
 const express = require('express');
-const Artwork = require('./Artworks'); // Import Artworks
-const Review = require('./models/review'); // Import the review model
-const Like = require('./models/like'); // Import the like model
-const Workshop = require('./models/workshop'); // Import the Workshop model
-const Notification = require('./models/notification'); // Import Notification model
-const { User } = require('./user'); // Import the User model for managing user data
-const { authMiddleware } = require('./user'); // Import authentication middleware for user validation
-const { ensureLoggedIn } = require('./middleware'); // Import middleware to ensure user is logged in
-const router = express.Router(); // Create a new router object to handle routing
+const Artwork = require('./Artworks');
+const Review = require('./models/review');
+const Like = require('./models/like');
+const Workshop = require('./models/workshop');
+const Notification = require('./models/notification');
+const { User } = require('./user');
+const { authMiddleware } = require('./user');
+const { ensureLoggedIn } = require('./middleware');
+const router = express.Router();
 
-// Get HTTP
-router.get('/', ensureLoggedIn, (req, res) => { // Route for the main Patron Dashboard
+router.get('/', ensureLoggedIn, (req, res) => {
     if (req.query.success) {
         res.locals.success = req.query.success;
     }
@@ -22,7 +21,7 @@ router.get('/follow-artist', ensureLoggedIn, async (req, res) => {
         const user = await User.findById(req.session.user._id).populate('followedArtists');
         res.render('followedArtists', { 
             followedArtists: user.followedArtists, 
-            user: req.session.user // Pass the user object to the template
+            user: req.session.user
         });
     } catch (error) {
         console.error('Error fetching followed artists:', error);
@@ -33,18 +32,16 @@ router.get('/follow-artist', ensureLoggedIn, async (req, res) => {
 router.get('/reviewed-liked-artworks', ensureLoggedIn, async (req, res) => {
     try {
         const userId = req.session.user._id;
-        // Fetch reviews and likes made by the user and populate the Artwork references
         const reviews = await Review.find({ userId: userId }).populate('artworkId');
         const likes = await Like.find({ userId: userId }).populate('artworkId');
-        // Filter out any reviews or likes that have null artwork references
         const validReviews = reviews.filter(review => review.artworkId !== null);
         const validLikes = likes.filter(like => like.artworkId !== null);
-        // Pass the filtered reviews and likes to the template
+        //pass the filtered reviews and likes to the template
         res.render('reviewedAndLiked', {
             reviewedArtworks: validReviews,
             likedArtworks: validLikes,
             user: req.session.user,
-            query: req.query // Pass the query object
+            query: req.query
         });
     } catch (error) {
         console.error('Error fetching reviewed/liked artworks:', error);
@@ -52,13 +49,13 @@ router.get('/reviewed-liked-artworks', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/notifications', ensureLoggedIn, async (req, res) => { // Route to display notifications
+router.get('/notifications', ensureLoggedIn, async (req, res) => {
     try {
         const userId = req.session.user._id;
         const notifications = await Notification.find({ user: userId })
-            .populate('artist', 'username') // Ensure this matches the field in the User model
+            .populate('artist', 'username')
             .sort({ createdAt: -1 });
-            res.render('notifications', { 
+            res.render('notifications', {
                 notifications,
                 user: req.session.user
             });
@@ -75,7 +72,7 @@ router.get('/search-artworks', ensureLoggedIn, async (req, res) => {
     const skip = (page - 1) * limit;
     try {
         if (query) {
-            const regexQuery = new RegExp(query, 'i'); // Case insensitive regex
+            const regexQuery = new RegExp(query, 'i');
             const artworks = await Artwork.find({
                 $or: [
                     { Title: regexQuery },
@@ -105,7 +102,7 @@ router.get('/search-artworks', ensureLoggedIn, async (req, res) => {
                 user: req.session.user
             });
         } else {
-            res.render('searchArtworks', { // Render the search page without any artworks
+            res.render('searchArtworks', {
                 artworks: [],
                 query: '',
                 user: req.session.user
@@ -125,7 +122,6 @@ router.get('/artwork/:id', ensureLoggedIn, async (req, res) => {
         }
         const reviews = await Review.find({ artworkId: req.params.id });
         const likes = await Like.find({ artworkId: req.params.id });
-        // Check if current user has liked the artwork
         const userLike = likes.find(like => like.userId.toString() === req.session.user._id.toString());
         const isArtistOfArtwork = req.session.user.username === artwork.Artist;
         res.render('artworkDetails', { 
@@ -182,13 +178,12 @@ router.get('/artist/:artistName', ensureLoggedIn, async (req, res) => {
     }
 });
 
-//Post HTTP
 router.post('/artwork/:id/review', ensureLoggedIn, async (req, res) => {
     try {
         const artworkId = req.params.id;
         const userId = req.session.user._id;
-        const artwork = await Artwork.findById(artworkId); // Fetch the artwork to check the artist
-        // Prevent artists from reviewing their own artwork
+        const artwork = await Artwork.findById(artworkId);
+        //prevent artists from reviewing their own artwork
         if (artwork.Artist === req.session.user.username) {
             return res.redirect('/patron/artwork/' + artworkId + '?error=Cannot review own artwork');
         }
@@ -209,8 +204,8 @@ router.post('/artwork/:id/like', ensureLoggedIn, async (req, res) => {
     try {
         const artworkId = req.params.id;
         const userId = req.session.user._id;
-        const artwork = await Artwork.findById(artworkId);  // Fetch the artwork to check the artist
-        // Prevent artists from liking their own artwork
+        const artwork = await Artwork.findById(artworkId);
+        //prevent artists from liking their own artwork
         if (artwork.Artist === req.session.user.username) {
             return res.redirect('/patron/artwork/' + artworkId + '?error=Cannot like own artwork');
         }
@@ -226,7 +221,7 @@ router.post('/artwork/:id/like', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.post('/artwork/:artworkId/remove-review/:reviewId', ensureLoggedIn, async (req, res) => { // Remove review route
+router.post('/artwork/:artworkId/remove-review/:reviewId', ensureLoggedIn, async (req, res) => {
     try {
         await Review.deleteOne({ _id: req.params.reviewId, userId: req.session.user._id });
         res.redirect('/patron/artwork/' + req.params.artworkId);
@@ -236,7 +231,7 @@ router.post('/artwork/:artworkId/remove-review/:reviewId', ensureLoggedIn, async
     }
 });
 
-router.post('/artwork/:artworkId/remove-like/:likeId', ensureLoggedIn, async (req, res) => { // Remove like routes
+router.post('/artwork/:artworkId/remove-like/:likeId', ensureLoggedIn, async (req, res) => {
     try {
         await Like.deleteOne({ _id: req.params.likeId, userId: req.session.user._id });
         res.redirect('/patron/artwork/' + req.params.artworkId);
@@ -250,11 +245,11 @@ router.post('/follow-artist/:artistName', authMiddleware, async (req, res) => {
     try {
         const artistName = req.params.artistName;
         const userId = req.session.user._id;
-        const artist = await User.findOne({ username: artistName }); // Find the artist by name to get their ID
+        const artist = await User.findOne({ username: artistName });
         if (!artist) {
             return res.status(404).send('Artist not found');
         }
-        // Add artist's ID to the user's followed artists list
+        //add artist's ID to the user's followed artists list
         await User.findByIdAndUpdate(userId, {
             $addToSet: { followedArtists: artist._id }
         });
@@ -270,8 +265,8 @@ router.post('/enroll-workshop/:workshopId', ensureLoggedIn, async (req, res) => 
         const workshopId = req.params.workshopId;
         const userId = req.session.user._id;
         const redirectArtist = req.query.redirect;
-        await Workshop.findByIdAndUpdate(workshopId, { $addToSet: { enrolledUsers: userId } }); // Enroll the user in the workshop
-        res.redirect(`/patron/artist/${redirectArtist}`); // Redirect the response to the artist's profile page
+        await Workshop.findByIdAndUpdate(workshopId, { $addToSet: { enrolledUsers: userId } });
+        res.redirect(`/patron/artist/${redirectArtist}`); //redirect the response to the artist's profile page
     } catch (error) {
         console.error('Error enrolling in workshop:', error);
         res.status(500).send('Error enrolling in workshop');
@@ -282,14 +277,14 @@ router.post('/unfollow-artist/:artistName', ensureLoggedIn, async (req, res) => 
     try {
         const artistName = req.params.artistName;
         const userId = req.session.user._id;        
-        const artist = await User.findOne({ username: artistName }); // Find the artist by name to get their ID
+        const artist = await User.findOne({ username: artistName });
         if (!artist) {
             return res.status(404).send('Artist not found');
         }
-        await User.findByIdAndUpdate(userId, { // Remove the artist's ID from the user's followed artists list
+        await User.findByIdAndUpdate(userId, { //remove the artist's ID from the user's followed artists list
             $pull: { followedArtists: artist._id }
         });
-        res.redirect('/patron/artist/' + artistName + '?success=Unfollowed ' + artistName); // Redirect back to the artist's profile with a success message
+        res.redirect('/patron/artist/' + artistName + '?success=Unfollowed ' + artistName);
     } catch (error) {
         console.error('Error unfollowing artist:', error);
         res.status(500).send('Error occurred while unfollowing the artist');

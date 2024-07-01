@@ -33,7 +33,7 @@ const connectWithRetry = () => {
     mongoose.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        ssl: true // Ensure SSL is enabled
+        ssl: true //ensure SSL is enabled
     }).then(() => {
         console.log('MongoDB is connected');
     }).catch(err => {

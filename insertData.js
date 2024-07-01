@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Artwork = require('./Artworks'); // Import the Artwork model
+const Artwork = require('./Artworks');
 const path = require('path');
 const fs = require('fs');
 

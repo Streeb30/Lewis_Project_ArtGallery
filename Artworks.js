@@ -18,5 +18,4 @@ const artworkSchema = new mongoose.Schema({
 // Create a model from the schema only if it doesn't already exist
 const Artwork = mongoose.models.Artworks || mongoose.model('Artworks', artworkSchema);
 
-// Export the model so it can be imported and used in other parts of the application
 module.exports = Artwork;

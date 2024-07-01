@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Artwork = require('./Artworks'); // Import the Artwork model
 
 // Define the user schema
 const userSchema = new mongoose.Schema({
@@ -20,7 +21,7 @@ const userSchema = new mongoose.Schema({
     artistProfile: { // Profile for artist users, stores array of artwork references
         artworks: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Artwork'
+            ref: 'Artworks' // Ensure this matches the model name used in Artworks.js
         }]
     },
     followedArtists: [{
@@ -48,7 +49,6 @@ const register = async (req, res) => {
     }
 };
 
-
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -66,25 +66,25 @@ const login = async (req, res) => {
 
 // Authentication Middleware
 const authMiddleware = (req, res, next) => {
-  if (req.session && req.session.user) {
-      return next();
-  } else {
-      return res.status(401).send('Unauthorized');
-  }
+    if (req.session && req.session.user) {
+        return next();
+    } else {
+        return res.status(401).send('Unauthorized');
+    }
 };
 
 // Function to switch a user's account type
 const switchAccountType = async (req, res) => {
-  try {
-      const { username, newType } = req.body;
-      const updatedUser = await User.findOneAndUpdate({ username }, { accountType: newType }, { new: true });
-      if (!updatedUser) {
-          return res.status(404).send('User not found');
-      }
-      res.send(`Account type updated to ${newType}`);
-  } catch (error) {
-      res.status(500).send(error.message);
-  }
+    try {
+        const { username, newType } = req.body;
+        const updatedUser = await User.findOneAndUpdate({ username }, { accountType: newType }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).send('User not found');
+        }
+        res.send(`Account type updated to ${newType}`);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
 };
 
 // Exporting the User model and functions

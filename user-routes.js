@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User, register, login, authMiddleware, switchAccountType } = require('./user');
+const Artwork = require('./Artworks');
 
 const ensureLoggedIn = (req, res, next) => {
     if (req.session && req.session.user) {

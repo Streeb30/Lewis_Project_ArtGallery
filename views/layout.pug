@@ -2,32 +2,11 @@ doctype html
 html
   head
     title Art Gallery Account System
-    link(rel='icon', href='/favicon.ico', type='image/x-icon')
-    style.
-      body {
-        background-color: #E0FFFF;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        font-family: Arial, sans-serif;
-      }
-      h1 {
-        color: #333;
-        font-size: 3em;
-        text-align: center;
-      }
-      p {
-        text-align: center;
-        font-size: 1.5em;
-      }
-      a {
-        color: #0066CC;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
+    link(rel='icon', href='/myfavicon.ico', type='image/x-icon')
   body
     block content
+      h1(style='color: blue;') Welcome to the User Account System
+      p
+        a(href='/user/login', style='color: green;') Login
+      p
+        a(href='/user/register', style='color: red;') Register

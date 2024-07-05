@@ -1,6 +1,6 @@
 
   body {
-    background-color: #E0FFFF; /* 浅青色背景 */
+    background-color: #E0FFFF;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,7 +24,7 @@
   
   a {
     text-decoration: none;
-    color: #007BFF; /* 链接颜色 */
+    color: #007BFF;
     font-weight: bold;
   }
   
@@ -33,7 +33,7 @@
   }
   
   .large-font {
-    font-size: 1.3em; /* 你可以根据需要调整这个值 */
+    font-size: 1.3em;
   }
 
   .login-container {
@@ -70,7 +70,7 @@
   }
 
   .header {
-    align-self: flex-start; /* 左对齐 */
+    align-self: flex-start;
   }
 
   .header h1 {
@@ -93,9 +93,9 @@
     font-size: 1.2em;
     display: flex;
     flex-direction: column;
-    align-items: center; /* 水平居中 */
-    justify-content: center; /* 垂直居中 */
-    flex-grow: 1; /* 占据剩余空间 */
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
   }
   
   .center-content ul {
@@ -111,6 +111,6 @@
   }
 
   .logout-link {
-    align-self: flex-start; /* 左对齐 */
-    margin-top: 20px; /* 向上移动 */
+    align-self: flex-start;
+    margin-top: 20px;
   }

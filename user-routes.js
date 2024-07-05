@@ -1,7 +1,15 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const router = express.Router();
 const { User, register, login, authMiddleware, switchAccountType } = require('./user');
 const Artwork = require('./Artworks');
+
+const getGalleryArtworks = () => {
+    const galleryPath = path.join(__dirname, 'gallery.json');
+    const galleryData = fs.readFileSync(galleryPath, 'utf8');
+    return JSON.parse(galleryData);
+};
 
 const ensureLoggedIn = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -40,7 +48,15 @@ router.get('/upgrade-to-artist', ensureLoggedIn, async (req, res) => {
     try {
         const userId = req.session.user._id;
         const user = await User.findById(userId).populate('artistProfile.artworks');
-        if (user.artistProfile && user.artistProfile.artworks.length > 0) {
+
+        // Load hardcoded artworks from gallery.json
+        const galleryArtworks = getGalleryArtworks();
+        const userGalleryArtworks = galleryArtworks.filter(artwork => artwork.artistId === userId.toString());
+
+        // Merge database artworks with gallery artworks
+        const totalArtworks = (user.artistProfile.artworks || []).length + userGalleryArtworks.length;
+
+        if (totalArtworks > 0) {
             user.accountType = 'artist';
             await user.save();
             req.session.user.accountType = 'artist';
@@ -96,21 +112,28 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/switch-account-type', ensureLoggedIn, async (req, res) => {
-    const user = await User.findById(req.session.user._id);
-    if (user.accountType === 'patron' && (user.artistProfile && user.artistProfile.artworks.length > 0)) {
-        user.accountType = 'artist';
-    } else {
-        user.accountType = 'patron';
-    }
-    await user.save();
-    req.session.user = user;
-    req.session.save(err => {
-        if (err) {
-            console.error('Session save error:', err);
-            return res.status(500).send('Failed to save session');
+    try {
+        const user = await User.findById(req.session.user._id).populate('artistProfile.artworks');
+        
+        if (user.accountType === 'patron' && (user.artistProfile && user.artistProfile.artworks.length > 0)) {
+            user.accountType = 'artist';
+        } else {
+            user.accountType = 'patron';
         }
-        res.redirect(user.accountType === 'artist' ? '/artist/artist-dashboard' : '/patron');
-    });
+        
+        await user.save();
+        req.session.user = user;
+        req.session.save(err => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.status(500).send('Failed to save session');
+            }
+            res.redirect(user.accountType === 'artist' ? '/artist/artist-dashboard' : '/patron');
+        });
+    } catch (error) {
+        console.error('Error switching account type:', error);
+        res.status(500).send('Error occurred while switching account type');
+    }
 });
 
 module.exports = router;

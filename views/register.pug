@@ -1,20 +1,21 @@
 extends layout
 
 block content
-  h1 Register
-  if quelry && query.error
-    script.
-      alert("#{query.error}")
-      
-  form(method="post", action="/user/register")
-    div
-      label(for="username") Username:
-      input(type="text", name="username")
-    div
-      label(for="password") Password:
-      input(type="password", name="password")
-    div
-      button(type="submit") Register
+  .login-container
+    h1 Please create your ID and password to Register an art account
+    if error
+      script.
+        alert("#{error}")
 
-  p
-    a(href='/') Back To Home Page
+    form(method="post", action="/user/register")
+      div
+        label(for="username") Username:
+        input(type="text", name="username")
+      div
+        label(for="password") Password:
+        input(type="password", name="password")
+      div
+        button(type="submit") Register
+
+    p
+      a(href='/') Back To Home Page

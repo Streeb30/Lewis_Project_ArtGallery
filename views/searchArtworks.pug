@@ -1,28 +1,32 @@
-extends layout
+extends layout_2
 
 block content
-  h1 Search Artworks
-  form(method='get', action='/patron/search-artworks')
-    input(type='text', name='query', placeholder='Search by title, artist, or category', value=query)
-    button(type='submit') Search
+  .search-container
+    h1 Search Artworks and Artists
+    form.search-form(method='get', action='/patron/search-artworks')
+      input.search-input(type='text', name='query', placeholder='Search by title, artist, or category', value=query)
+      button.search-button(type='submit') Search
 
-  if artworks.length
-    ul
-      each artwork in artworks
-        li
-          a(href=`/patron/artwork/${artwork._id}`)= artwork.Title
-          |  by #{artwork.Artist}
+    if artworks.length
+      .searched-artworks
+        ul
+          each artwork in artworks
+            li
+              a(href=`/patron/artwork/${artwork._id}`)= artwork.Title
+              |  by #{artwork.Artist}
 
-    if pagination.hasPrev
-      a(href=`/patron/search-artworks?query=${query}&page=${pagination.prev}`) Previous
-    if pagination.hasNext
-      a(href=`/patron/search-artworks?query=${query}&page=${pagination.next}`) Next
+      if pagination.hasNext
+        a(href=`/patron/search-artworks?query=${query}&page=${pagination.next}`) Next
+      if pagination.hasPrev
+        | &nbsp;&nbsp;&nbsp;
+        a(href=`/patron/search-artworks?query=${query}&page=${pagination.prev}`) Previous
+      
+    else
+      p No artworks found for your query right now.
 
-  else
-    p No artworks found for your query.
-
-  h2 
-  if user.accountType === 'artist'
-        a(href='/artist/artist-dashboard') Back to Artist Dashboard
-  else
-      a(href='/patron') Back to Patron Page
+    .search-container
+      h2 
+      if user.accountType === 'artist'
+            a(href='/artist/artist-dashboard') Back to Artist Dashboard
+      else
+          a(href='/patron') Back to Patron Page

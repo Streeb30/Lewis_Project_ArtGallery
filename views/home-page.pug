@@ -1,8 +1,10 @@
 extends layout
 
 block content
-  h1 Welcome to the User Account System
-  p
-    a(href='/user/login') Login
-  p
-    a(href='/user/register') Register
+  .container
+    h1 Welcome to the Online Art Gallery
+    .links
+      p
+        a(href='/user/login', class = 'large-font') Login
+      p
+        a(href='/user/register', class = 'large-font') Register

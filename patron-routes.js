@@ -204,8 +204,13 @@ router.post('/artwork/:id/like', ensureLoggedIn, async (req, res) => {
     try {
         const artworkId = req.params.id;
         const userId = req.session.user._id;
+        const existingLike = await Like.findOne({ artworkId, userId });
+        if (existingLike) {
+            return res.redirect(`/patron/artwork/${artworkId}?error=You have already liked this artwork`);
+        }
+
         const artwork = await Artwork.findById(artworkId);
-        //prevent artists from liking their own artwork
+        // Prevent artists from liking their own artwork
         if (artwork.Artist === req.session.user.username) {
             return res.redirect('/patron/artwork/' + artworkId + '?error=Cannot like own artwork');
         }

@@ -1,7 +1,7 @@
-extends layout
+extends layout_2
 
 block content
-    h1= artwork.Title
+    h1 Artwork Name: #{artwork.Title}
     p
         strong Artist: 
         a(href='/patron/artist/' + artwork.Artist)= artwork.Artist
@@ -33,6 +33,9 @@ block content
             button(type='submit') Submit Review
 
     h2 Likes
+    if error
+      script.
+        alert("#{error.replace(/"/g, '\\"')}")
     p Number of likes: #{likes.length}
     form(method='post', action='/patron/artwork/' + artwork._id + '/like')
         button(type='submit') Like
@@ -47,8 +50,8 @@ block content
 
     script.
         document.addEventListener('DOMContentLoaded', function() {
-            const reviewForm = document.querySelector('form[action^="/patron/artwork/' + #{artwork._id} + '/review"]');
-            const likeForm = document.querySelector('form[action^="/patron/artwork/' + #{artwork._id} + '/like"]');
+            const reviewForm = document.querySelector('form[action^="/patron/artwork/' + #{JSON.stringify(artwork._id)} + '/review"]');
+            const likeForm = document.querySelector('form[action^="/patron/artwork/' + #{JSON.stringify(artwork._id)} + '/like"]');
 
             const artistName = #{JSON.stringify(artwork.Artist)};
             const currentUsername = #{JSON.stringify(req.session.user.username)};
@@ -63,4 +66,3 @@ block content
             if (reviewForm) reviewForm.addEventListener('submit', showAlert);
             if (likeForm) likeForm.addEventListener('submit', showAlert);
         });
-

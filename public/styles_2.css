@@ -1,0 +1,112 @@
+body {
+    background-color: #E0FFFF; /* 浅青色背景 */
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  a {
+    text-decoration: none;
+    color: #007BFF; /* 链接颜色 */
+    font-weight: bold;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .noti-container {
+    text-align: center;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .noti-container ul{
+    list-style-type: none;
+  }
+
+  .new-artwork {
+    margin-bottom: 40px; /* 增加底部间距 */
+  }
+  
+  .new-workshop {
+    margin-top: 100px; /* 增加底部间距 */
+  }
+  
+  .read {
+    color: grey; /* 已读通知的颜色 */
+  }
+  
+  .unread {
+    color: black; /* 未读通知的颜色 */
+  }
+
+  .back-link {
+    position: absolute;
+    left: 20px;
+    bottom: 330px; /* 可根据需要调整位置 */
+    text-decoration: none;
+    color: #007BFF; /* 链接颜色 */
+    font-weight: bold;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .artwork-list {
+    list-style-type: none; /* 移除小点 */
+    padding: 0;
+  }
+  
+  .artwork-list li {
+    margin-bottom: 10px;
+  }
+
+  .artwork-list a {
+    color: #ff006a; /* 设置链接颜色为粉色 */
+
+  }
+
+  .follow-artist-section {
+    margin-top: 100px;
+  }
+
+  .search-container h1{
+    font-size: 2.2em;
+  }
+
+  .search-container h2{
+    margin-top: 60px;
+  }
+
+  .search-form {
+    margin: 20px 0;
+  }
+  
+  .search-input {
+    width: 35%; /* 调整输入框的宽度 */
+    padding: 10px; /* 增加内边距以扩大输入框 */
+    font-size: 1em; /* 增大字体 */
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .search-button {
+    padding: 10px 20px; /* 增加按钮的内边距 */
+    font-size: 1em; /* 增大字体 */
+    border: 2px solid #007BFF;
+    background-color: #007BFF;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .search-button:hover {
+    background-color: #0056b3; /* 悬停时按钮颜色 */
+  }
+  
+  .searched-artworks{
+    font-size: 1.4em;
+  }

@@ -1,23 +1,24 @@
 extends layout
 
 block content
-  h1 Patron Dashboard
-  if success
-    script.
-      alert("#{success}")
-  p Welcome! #{user.username}
-  ul
-    li
-      a(href='/patron/follow-artist') Artists Followed
-    li
-      a(href='/patron/reviewed-liked-artworks') Reviewed/Liked Artworks
-    li
-      a(href='/patron/notifications') Notifications
-    li
-      a(href='/patron/search-artworks') Search Artworks
-      
-  p
-    a(href='/user/upgrade-to-artist') Upgrade to Artist
-
-  p
-    a(href='/user/logout') Log out
+  .dashboard-container
+    .header 
+      h1 Patron Dashboard
+      if success
+        script.
+          alert("#{success}")
+      p.welcome-message #{user.username}, Welcome!
+    .center-content
+      ul
+        li
+          a(href='/patron/follow-artist') Artists Followed
+        li
+          a(href='/patron/reviewed-liked-artworks') Reviewed/Liked Artworks
+        li
+          a(href='/patron/notifications') Notifications
+        li
+          a(href='/patron/search-artworks') Search Artworks and Artists
+        li
+          a(href='/user/upgrade-to-artist') Upgrade to Artist
+      p.logout-link
+        a(href='/user/logout') Log out

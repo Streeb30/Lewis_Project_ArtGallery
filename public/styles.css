@@ -1,0 +1,116 @@
+
+  body {
+    background-color: #E0FFFF; /* 浅青色背景 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 3.6em;
+    margin-bottom: 20px;
+  }
+  
+  .links p {
+    margin: 10px 0;
+  }
+  
+  a {
+    text-decoration: none;
+    color: #007BFF; /* 链接颜色 */
+    font-weight: bold;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  .large-font {
+    font-size: 1.3em; /* 你可以根据需要调整这个值 */
+  }
+
+  .login-container {
+    text-align: center;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .login-container h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+    
+  form div {
+    margin-bottom: 10px;
+  }
+    
+  form label {
+    margin-right: 10px;
+  }
+  
+  .dashboard-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+  }
+
+  .header {
+    align-self: flex-start; /* 左对齐 */
+  }
+
+  .header h1 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+  }
+
+  .header h2 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+  }
+
+  .welcome-message {
+    font-weight: bold;
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .center-content {
+    font-size: 1.2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 水平居中 */
+    justify-content: center; /* 垂直居中 */
+    flex-grow: 1; /* 占据剩余空间 */
+  }
+  
+  .center-content ul {
+    list-style-type: disc;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .center-content ul li {
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .logout-link {
+    align-self: flex-start; /* 左对齐 */
+    margin-top: 20px; /* 向上移动 */
+  }

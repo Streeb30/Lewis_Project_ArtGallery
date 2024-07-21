@@ -4,5 +4,21 @@ html
     title Art Gallery Account System
     link(rel='icon', href='/myfavicon.ico', type='image/x-icon')
     link(rel='stylesheet', href='/styles.css')
+    script.
+      const socket = new WebSocket('ws://localhost:3000');
+
+      socket.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log('Received:', data);
+        alert(`Notification: ${data.message}`);
+      };
+
+      function sendMessage(message) {
+        socket.send(JSON.stringify({ message }));
+      }
   body
     block content

@@ -5,7 +5,7 @@ block content
     h1 Your Notifications!
 
     if notifications.length
-      ul
+      ul#notification-list
         each notification in notifications
           li(class=notification.read ? 'read' : 'unread')
             p Artist: #{notification.artist.username}

@@ -9,8 +9,13 @@ const patronRoutes = require('./patron-routes');
 const userRoutes = require('./user-routes');
 const path = require('path');
 const MongoStore = require('connect-mongo');
+const http = require('http');
+const WebSocket = require('ws');
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -59,7 +64,7 @@ db.once('open', async () => {
 
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log(`Server listening at http://localhost:${PORT}`);
     });
 }
@@ -68,4 +73,18 @@ app.get('/', (req, res) => {
     res.render('home-page');
 });
 
+// WebSocket connection handling
+wss.on('connection', (ws) => {
+    console.log('New client connected');
+
+    ws.on('message', (message) => {
+        console.log(`Received message => ${message}`);
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
+
+app.locals.wss = wss;
 module.exports = app;

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const { User, register, login, authMiddleware, switchAccountType } = require('./user');
 const Artwork = require('./Artworks');
 
@@ -17,6 +18,17 @@ const ensureLoggedIn = (req, res, next) => {
     } else {
         res.status(401).send('Unauthorized');
     }
+};
+
+const generateToken = (user) => {
+    const payload = {
+        id: user._id,
+        username: user.username,
+        accountType: user.accountType
+    };
+    const secret = process.env.JWT_SECRET || 'default_secret';
+    const options = { expiresIn: '1h' };
+    return jwt.sign(payload, secret, options);
 };
 
 router.get('/register', (req, res) => {
@@ -91,23 +103,13 @@ router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         if (!user || user.password !== password) {
-            return res.redirect('/user/login?error=Invalid username or password');
+            return res.json({ success: false, message: 'Invalid username or password' });
         }
-        req.session.user = user;
-        req.session.save(err => {
-            if (err) {
-                console.error('Session save error:', err);
-                return res.status(500).send('Failed to save session');
-            }
-            if (user.accountType === 'artist') {
-                res.redirect('/artist/artist-dashboard');
-            } else {
-                res.redirect('/patron');
-            }
-        });
+        const token = generateToken(user);
+        res.json({ success: true, token, user });
     } catch (error) {
         console.error('Login error:', error);
-        res.redirect('/user/login?error=An error occurred. Please try again.');
+        res.json({ success: false, message: 'An error occurred. Please try again.' });
     }
 });
 

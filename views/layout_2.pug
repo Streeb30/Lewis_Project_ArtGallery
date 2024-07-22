@@ -4,58 +4,5 @@ html
     title Art Gallery Account System
     link(rel='icon', href='/myfavicon.ico', type='image/x-icon')
     link(rel='stylesheet', href='/styles_2.css')
-    script.
-      const socket = new WebSocket('ws://localhost:3000');
-
-      socket.onopen = () => {
-        console.log('WebSocket connection established');
-      };
-
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        console.log('Received:', data);
-        alert(`Notification: ${data.message}`);
-        
-        fetch('/notifications', {
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(notifications => {
-          const notificationList = document.getElementById('notification-list');
-          notificationList.innerHTML = '';
-          notifications.forEach(notification => {
-            const li = document.createElement('li');
-            li.className = notification.read ? 'read' : 'unread';
-            const artistInfo = document.createElement('p');
-            artistInfo.textContent = `Artist: ${notification.artist.username}`;
-            li.appendChild(artistInfo);
-            switch (notification.type) {
-              case 'new_artwork':
-                const artworkLink = document.createElement('a');
-                artworkLink.href = `/patron/artwork/${notification.referenceId}`;
-                artworkLink.textContent = `New artwork added: ${notification.message}`;
-                li.appendChild(artworkLink);
-                break;
-              case 'new_workshop':
-                const workshopLink = document.createElement('a');
-                workshopLink.href = `/patron/workshop/${notification.referenceId}`;
-                workshopLink.textContent = `New workshop created: ${notification.message}`;
-                li.appendChild(workshopLink);
-                break;
-              default:
-                const defaultMsg = document.createElement('p');
-                defaultMsg.textContent = notification.message;
-                li.appendChild(defaultMsg);
-            }
-            notificationList.appendChild(li);
-          });
-        });
-      };
-
-      function sendMessage(message) {
-        socket.send(JSON.stringify({ message }));
-      }
   body
     block content

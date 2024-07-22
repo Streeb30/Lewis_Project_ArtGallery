@@ -55,15 +55,10 @@ router.get('/notifications', ensureLoggedIn, async (req, res) => {
         const notifications = await Notification.find({ user: userId })
             .populate('artist', 'username')
             .sort({ createdAt: -1 });
-        
-        if (req.accepts('html')) {
             res.render('notifications', {
                 notifications,
                 user: req.session.user
             });
-        } else if (req.accepts('json')) {
-            res.json(notifications);
-        }
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).send('Error fetching notifications');

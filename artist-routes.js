@@ -105,7 +105,7 @@ router.get('/switch-to-patron', async (req, res) => {
 router.post('/add-artwork', ensureLoggedIn, async (req, res) => {
     try {
         const { Title, Year, Category, Medium, Description, Poster } = req.body;
-        const artistName = req.session.user.username;
+        const artistName = req.session.user.username; // Artist's username for the message
         const artistId = req.session.user._id;
         const existingArtwork = await Artwork.findOne({ Title: Title });
         if (existingArtwork) {
@@ -123,30 +123,21 @@ router.post('/add-artwork', ensureLoggedIn, async (req, res) => {
             Description,
             Poster
         });
-        await newArtwork.save();
+        await newArtwork.save(); // Save the new artwork
         await createNotificationForFollowers(artistId, `New artwork added: ${Title}`, 'artwork', newArtwork._id);
-
-        const user = await User.findById(artistId);
+        const user = await User.findById(artistId); // Fetch the current user
+        // Check if the user has an artistProfile and artworks array
         if (user.artistProfile) {
-            user.artistProfile.artworks.push(newArtwork._id);
+            user.artistProfile.artworks.push(newArtwork._id); // Add the new artwork ID to the user's artworks array
         } else {
-            user.artistProfile = { artworks: [newArtwork._id] };
+            user.artistProfile = { artworks: [newArtwork._id] }; // If not, create the artistProfile and artworks array
         }
 
         if (user.accountType === 'patron') {
             user.accountType = 'artist';
         }
-        await user.save();
+        await user.save(); // Save the updated user
         req.session.user = user;
-
-        // WebSocket notification
-        const notification = { message: `New artwork added: ${Title} by ${artistName}` };
-        req.app.locals.wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(notification));
-            }
-        });
-
         res.redirect('/artist/artist-dashboard');
     } catch (error) {
         console.error('Error adding artwork:', error);
@@ -157,25 +148,17 @@ router.post('/add-artwork', ensureLoggedIn, async (req, res) => {
 router.post('/add-workshop', ensureLoggedIn, async (req, res) => {
     try {
         const { title } = req.body;
-        const artistId = req.session.user._id;
-        const artistName = req.session.user.username;
+        const artistId = req.session.user._id; // Use artist's ObjectId
+        const artistName = req.session.user.username; // Artist's username for the message
 
         const newWorkshop = new Workshop({
             title,
             artist: artistId,
-            enrolledUsers: []
+            enrolledUsers: [] // Initially empty
         });
         await newWorkshop.save();
+        // Create notifications for followers
         await createNotificationForFollowers(artistId, `New workshop created: ${title}`, 'workshop', newWorkshop._id);
-
-        // WebSocket notification
-        const notification = { message: `New workshop created: ${title} by ${artistName}` };
-        req.app.locals.wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(notification));
-            }
-        });
-
         res.redirect('/artist/artist-dashboard');
     } catch (error) {
         console.error('Error adding workshop:', error);

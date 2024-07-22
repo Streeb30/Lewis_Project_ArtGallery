@@ -7,41 +7,15 @@ block content
       script.
         alert("#{query.error}")
         
-    form(id="loginForm")
+    form(method="post", action="/user/login")
       div
         label(for="username") Username:
-        input(type="text", id="username", name="username")
+        input(type="text", name="username")
       div
         label(for="password") Password:
-        input(type="password", id="password", name="password")
+        input(type="password", name="password")
       div
         button(type="submit") Login
 
     p
       a(href='/') Back To Home Page
-
-    script.
-      document.getElementById('loginForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        const response = await fetch('/user/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ username, password })
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          const uniqueTabID = Date.now().toString();
-          localStorage.setItem('uniqueTabID', uniqueTabID);
-          localStorage.setItem(`user_${uniqueTabID}`, JSON.stringify(result.user));
-          localStorage.setItem(`token_${uniqueTabID}`, result.token);
-          window.location.href = result.user.accountType === 'artist' ? '/artist/artist-dashboard' : '/patron';
-        } else {
-          alert(result.message);
-        }
-      });

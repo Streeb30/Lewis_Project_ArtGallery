@@ -6,7 +6,7 @@ const Workshop = require('./models/workshop');
 const Notification = require('./models/notification');
 const { User } = require('./user');
 const { authMiddleware } = require('./user');
-const { ensureLoggedIn } = require('./middleware');
+const { ensureLoggedIn, saveReferer } = require('./middleware');
 const router = express.Router();
 
 router.get('/', ensureLoggedIn, (req, res) => {
@@ -16,7 +16,7 @@ router.get('/', ensureLoggedIn, (req, res) => {
     res.render('patron', { user: req.session.user });
 });
 
-router.get('/follow-artist', ensureLoggedIn, async (req, res) => {
+router.get('/follow-artist', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const user = await User.findById(req.session.user._id).populate('followedArtists');
         res.render('followedArtists', { 
@@ -29,7 +29,7 @@ router.get('/follow-artist', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/reviewed-liked-artworks', ensureLoggedIn, async (req, res) => {
+router.get('/reviewed-liked-artworks', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const userId = req.session.user._id;
         const reviews = await Review.find({ userId: userId }).populate('artworkId');
@@ -49,23 +49,25 @@ router.get('/reviewed-liked-artworks', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/notifications', ensureLoggedIn, async (req, res) => {
+router.get('/notifications', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const userId = req.session.user._id;
         const notifications = await Notification.find({ user: userId })
             .populate('artist', 'username')
             .sort({ createdAt: -1 });
-            res.render('notifications', {
-                notifications,
-                user: req.session.user
-            });
+
+        res.render('notifications', {
+            notifications,
+            user: req.session.user,
+            session: req.session
+        });
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).send('Error fetching notifications');
     }
 });
 
-router.get('/search-artworks', ensureLoggedIn, async (req, res) => {
+router.get('/search-artworks', ensureLoggedIn, saveReferer, async (req, res) => {
     let { query, page = 1 } = req.query;
     page = parseInt(page);
     const limit = 10;
@@ -99,13 +101,15 @@ router.get('/search-artworks', ensureLoggedIn, async (req, res) => {
                 artworks,
                 pagination,
                 query,
-                user: req.session.user
+                user: req.session.user,
+                session: req.session 
             });
         } else {
             res.render('searchArtworks', {
                 artworks: [],
                 query: '',
-                user: req.session.user
+                user: req.session.user,
+                session: req.session
             });
         }
     } catch (error) {
@@ -114,7 +118,7 @@ router.get('/search-artworks', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/artwork/:id', ensureLoggedIn, async (req, res) => {
+router.get('/artwork/:id', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const artwork = await Artwork.findById(req.params.id);
         if (!artwork) {
@@ -131,7 +135,8 @@ router.get('/artwork/:id', ensureLoggedIn, async (req, res) => {
             userLike,
             req,
             user: req.session.user,
-            isArtistOfArtwork
+            isArtistOfArtwork,
+            session: req.session // Pass session to template
         });
     } catch (error) {
         console.error('Error fetching artwork:', error);
@@ -139,7 +144,7 @@ router.get('/artwork/:id', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/workshop/:workshopId', ensureLoggedIn, async (req, res) => {
+router.get('/workshop/:workshopId', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const workshopId = req.params.workshopId;
         const workshop = await Workshop.findById(workshopId)
@@ -149,7 +154,8 @@ router.get('/workshop/:workshopId', ensureLoggedIn, async (req, res) => {
         res.render('workshop', { 
             workshop, 
             isUserEnrolled, 
-            user: req.session.user
+            user: req.session.user,
+            session: req.session // Pass session to template
         });
     } catch (error) {
         console.error('Error fetching workshop:', error);
@@ -157,7 +163,7 @@ router.get('/workshop/:workshopId', ensureLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/artist/:artistName', ensureLoggedIn, async (req, res) => {
+router.get('/artist/:artistName', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const artist = await User.findOne({ username: req.params.artistName });
         if (!artist) {

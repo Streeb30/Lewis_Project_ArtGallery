@@ -1,5 +1,5 @@
 extends layout_2
-
+include mixins/backButton
 block content
     h1 Artwork Name: #{artwork.Title}
     p
@@ -43,11 +43,9 @@ block content
         form(method='post', action='/patron/artwork/' + artwork._id + '/remove-like/' + userLike._id)
             button(type='submit') Remove Like
 
-    if user.accountType === 'artist'
-        a(href='/artist/artist-dashboard') Back to Artist Dashboard
-    else
-        a(href='/patron') Back to Patron Page
-
+    if session && session.referer
+        +backButton(session.referer)
+        
     script.
         document.addEventListener('DOMContentLoaded', function() {
             const reviewForm = document.querySelector('form[action^="/patron/artwork/' + #{JSON.stringify(artwork._id)} + '/review"]');

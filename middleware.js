@@ -6,4 +6,11 @@ const ensureLoggedIn = (req, res, next) => {
     }
 };
 
-module.exports = { ensureLoggedIn };
+const saveReferer = (req, res, next) => {
+    if (req.headers.referer) {
+        req.session.referer = req.headers.referer;
+    }
+    next();
+};
+
+module.exports = { ensureLoggedIn, saveReferer };

@@ -4,7 +4,7 @@ const Notification = require('./models/notification');
 const { User } = require('./user');
 const Workshop = require('./models/workshop');
 const router = express.Router();
-const { ensureLoggedIn } = require('./middleware'); //import middleware to ensure user is logged in
+const { ensureLoggedIn, saveReferer } = require('./middleware');
 
 async function createNotificationForFollowers(artistId, message, type, referenceId) {
     const followers = await User.find({ followedArtists: artistId });
@@ -35,7 +35,7 @@ router.get('/add-workshop', ensureLoggedIn, (req, res) => {
 router.get('/artist-dashboard', ensureLoggedIn, async (req, res) => {
     try {
         const artistId = req.session.user._id;
-        const artistName = req.session.user.username; // Assuming the artist's username is the artist name
+        const artistName = req.session.user.username;
         const artworks = await Artwork.find({ Artist: artistName });
         const workshops = await Workshop.find({ artist: artistId });
         res.render('artistDashboard', {
@@ -102,7 +102,7 @@ router.get('/switch-to-patron', async (req, res) => {
     }
 });
 
-router.post('/add-artwork', ensureLoggedIn, async (req, res) => {
+router.post('/add-artwork', ensureLoggedIn, saveReferer, async (req, res) => {
     try {
         const { Title, Year, Category, Medium, Description, Poster } = req.body;
         const artistName = req.session.user.username; // Artist's username for the message
@@ -124,7 +124,7 @@ router.post('/add-artwork', ensureLoggedIn, async (req, res) => {
             Poster
         });
         await newArtwork.save(); // Save the new artwork
-        await createNotificationForFollowers(artistId, `New artwork added: ${Title}`, 'artwork', newArtwork._id);
+        await createNotificationForFollowers(artistId, `New artwork added: ${Title}`, 'new_artwork', newArtwork._id);
         const user = await User.findById(artistId); // Fetch the current user
         // Check if the user has an artistProfile and artworks array
         if (user.artistProfile) {
@@ -158,7 +158,7 @@ router.post('/add-workshop', ensureLoggedIn, async (req, res) => {
         });
         await newWorkshop.save();
         // Create notifications for followers
-        await createNotificationForFollowers(artistId, `New workshop created: ${title}`, 'workshop', newWorkshop._id);
+        await createNotificationForFollowers(artistId, `New workshop created: ${title}`, 'new_workshop', newWorkshop._id);
         res.redirect('/artist/artist-dashboard');
     } catch (error) {
         console.error('Error adding workshop:', error);

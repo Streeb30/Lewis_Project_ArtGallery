@@ -25,7 +25,7 @@ const notificationSchema = new mongoose.Schema({
     },
     referenceId: {
         type: mongoose.Schema.Types.ObjectId,
-        refPath: 'onModel'
+        required: true
     },
     onModel: {
         type: String,

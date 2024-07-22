@@ -8,17 +8,22 @@ block content
       ul#notification-list
         each notification in notifications
           li(class=notification.read ? 'read' : 'unread')
-            p Artist: #{notification.artist.username}
+            p Artist:
+              a(href='/patron/artist/' + notification.artist.username)= notification.artist.username
             case notification.type
               when 'new_artwork'
-                a(href='/patron/artwork/' + notification.referenceId.toString()) 
-                  p.new-artwork New artwork added: #{notification.message}
+                p.new-artwork 
+                  a(href=`/patron/artwork/${notification.referenceId}`) #{notification.message}
               when 'new_workshop'
-                a(href='/patron/workshop/' + notification.referenceId.toString()) 
-                  p.new-workshop New workshop created: #{notification.message}
+                p.new-workshop 
+                  a(href=`/patron/workshop/${notification.referenceId}`) #{notification.message}
               default
                 p= notification.message
-    if user.accountType === 'artist'
-      a.back-link(href='/artist/artist-dashboard') Back to Artist Dashboard
     else
-      a.back-link(href='/patron') Back to Patron Page
+      p No notifications at the moment.
+
+    .back-link-container
+      if user.accountType === 'artist'
+        a.back-link(href='/artist/artist-dashboard') Back to Artist Dashboard
+      else
+        a.back-link(href='/patron') Back to Patron Page
